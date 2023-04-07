@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+
+{% block title %} Settings {% endblock %}
+
+{% block content %}
+
+    <div class="container">
+        <div class="col-sm-8 col-sm-offset-2">
+            <h1>Settings</h1> 
+            <form class="form-horizontal" action="{% url 'settings'%}" method="post" enctype="multipart/form-data">
+                <div class="panel panel-default">
+                    <div class="panel-heading">Custom Font</div>
+                    <div class="panel-body">
+                        <span class="help-block" style="margin: 10px 0 20px;">
+                            A true-type font can be uploaded here to be used in the translation.
+                        </span>
+                        <div class="form-group">
+                            {% if text_font_name %}
+                            <label class="control-label col-sm-3" for="email">Uploaded Font:</label>
+                            <div class="col-sm-9">
+                                <p class="form-control-static">
+                                    {{text_font_name}} &nbsp;
+                                    <a href="#" onclick='removeFont()' title="Remove uploaded font" >
+                                        <span class="fa fa-btns fa-remove"></span>
+                                    </a>
+                                </p>
+                            </div>                       
+                            {% else %}
+                            <label class="control-label col-sm-3" for="uploaded_file">Upload Font:</label>
+                            <div class="col-sm-9" id="file_upload_wrapper">
+                                <p class="form-control-static">
+                                    {% csrf_token %} {{ form }}
+                                </p>
+                                <input type="submit" id="form-submit" class="btn btn-primary hidden" value="Upload">
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <style>
+        #file_upload_wrapper>p>label {
+            display: none;
+        }
+    </style>
+    <script>
+    
+        function getCookie(name) {
+            var value = "; " + document.cookie;
+            var parts = value.split("; " + name + "=");
+            if (parts.length == 2) return parts.pop().split(";").shift();
+        }
+        
+        function removeFont() {
+            $.ajax({
+                url: " {% url 'settings' %}",
+                type: "DELETE",
+                beforeSend: function(xhr) {
+                    xhr.setRequestHeader("X-CSRFToken", getCookie("csrftoken"));
+                },
+                success: function (response) {
+                    location.reload();
+                },
+                complete: function () {},
+                error: function (xhr, textStatus, thrownError) {}
+            });
+        }
+                
+        $(document).ready(function(){
+            $('#id_uploaded_file').change(function(e){
+                $('#form-submit').removeClass('hidden');
+            })
+        });
+        
+    </script>
+
+
+{% endblock %}
